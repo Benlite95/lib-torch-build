@@ -1,16 +1,41 @@
-TARGET_DIR="$BUILD_DIR/tmp/libtorch"
-mkdir -p $TARGET_DIR
-echo "-----> Downloading LibTorch from $LIBTORCH_URL..."
-curl -L $LIBTORCH_URL -o $TARGET_DIR/$LIBTORCH_ZIP
-echo "-----> Extracting LibTorch..."
-unzip -q $TARGET_DIR/$LIBTORCH_ZIP -d $TARGET_DIR
-rm $TARGET_DIR/$LIBTORCH_ZIP
+#!/usr/bin/env bash
+# Arguments provided by Heroku:
+#   $1 = BUILD_DIR (the root of your slug)
+#   $2 = CACHE_DIR (a cache directory you can use)
 
-# Adjust this if the archive extracts to a folder with a different name.
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+echo "-----> Installing LibTorch..."
+
+# Define the LibTorch download URL.
+# Adjust this URL to the version you need (here, a CPU-only build is used as an example).
+LIBTORCH_URL="https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip"
+LIBTORCH_ZIP="libtorch.zip"
+TARGET_DIR="$BUILD_DIR/tmp/libtorch"
+
+# Create target directory if it doesn't exist.
+mkdir -p "$TARGET_DIR"
+
+# Download LibTorch.
+echo "-----> Downloading LibTorch from $LIBTORCH_URL..."
+curl -L "$LIBTORCH_URL" -o "$TARGET_DIR/$LIBTORCH_ZIP"
+
+# Extract LibTorch.
+echo "-----> Extracting LibTorch..."
+unzip -q "$TARGET_DIR/$LIBTORCH_ZIP" -d "$TARGET_DIR"
+
+# Clean up the zip file.
+rm "$TARGET_DIR/$LIBTORCH_ZIP"
+
+# Determine the full path of the extracted LibTorch.
+# (Assuming the archive extracts to a folder named "libtorch")
 LIBTORCH_PATH="$TARGET_DIR/libtorch"
 
-mkdir -p $BUILD_DIR/.profile.d
-echo "export TORCH_DIR=$LIBTORCH_PATH" > $BUILD_DIR/.profile.d/libtorch.sh
+# Write a script to set the TORCH_DIR environment variable at runtime.
+mkdir -p "$BUILD_DIR/.profile.d"
+echo "export TORCH_DIR=$LIBTORCH_PATH" > "$BUILD_DIR/.profile.d/libtorch.sh"
 
 echo "-----> LibTorch installed at $LIBTORCH_PATH"
+
 exit 0
