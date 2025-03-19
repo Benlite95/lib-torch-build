@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+cat <<EOF
+{
+  "config": {
+    "TORCH_DIR": "/app/vendor/libtorch/libtorch"
+  }
+}
+EOF
